@@ -1,13 +1,5 @@
-import 'dotenv/config';
-import express from 'express';
-import mongoose from "mongoose"
-
-const app = express();
-app.use(express.json()); // lets the server read JSON request bodies
-
-app.get('/api/health', (req, res) => {
-  res.json({ ok: true });
-});
+import mongoose from "mongoose";
+import app from "./app.js";
 
 const PORT = process.env.PORT || 5000;
 
