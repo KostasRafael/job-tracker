@@ -1,12 +1,16 @@
 import 'dotenv/config';
 import express from 'express';
+import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 
 import errorHandler from './middleware/errorHandler.js';
 
 import authRouter from './routes/authRoutes.js';
 
 const app = express();
+app.use(helmet()); // sets safe HTTP response headers
 app.use(express.json()); // lets the server read JSON request bodies
+app.use(cookieParser()); // fills req.cookies from the Cookie header
 
 app.use('/api/auth', authRouter);
 
