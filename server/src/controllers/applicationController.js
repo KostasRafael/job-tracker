@@ -1,18 +1,36 @@
-import { createApplicationSchema } from '../validators/application.js';
+import { createApplicationSchema, updateApplicationSchema, moveSchema } from '../validators/application.js';
 import * as applicationService from '../services/applicationService.js';
-import HttpError from '../utils/HttpError.js';
+import parseBody from '../utils/parseBody.js';
 
 export async function createApplication(req, res) {
-  const parsed = createApplicationSchema.safeParse(req.body);
-  if (!parsed.success) {
-    throw new HttpError(400, parsed.error.issues[0].message);
-  }
-
-  const application = await applicationService.createApplication(req.user._id, parsed.data);
+  const data = parseBody(createApplicationSchema, req.body);
+  const application = await applicationService.createApplication(req.user._id, data);
   res.status(201).json(application);
 }
 
 export async function listApplications(req, res) {
   const applications = await applicationService.listApplications(req.user._id);
   res.json(applications);
+}
+
+export async function getApplication(req, res) {
+  const application = await applicationService.getApplication(req.user._id, req.params.id);
+  res.json(application);
+}
+
+export async function updateApplication(req, res) {
+  const data = parseBody(updateApplicationSchema, req.body);
+  const application = await applicationService.updateApplication(req.user._id, req.params.id, data);
+  res.json(application);
+}
+
+export async function deleteApplication(req, res) {
+  await applicationService.deleteApplication(req.user._id, req.params.id);
+  res.status(204).end();
+}
+
+export async function moveApplication(req, res) {
+  const data = parseBody(moveSchema, req.body);
+  const application = await applicationService.moveApplication(req.user._id, req.params.id, data);
+  res.json(application);
 }

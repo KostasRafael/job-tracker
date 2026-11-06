@@ -13,3 +13,8 @@ export const createApplicationSchema = z.object({
 });
 
 export const updateApplicationSchema = createApplicationSchema.partial();
+
+export const moveSchema = z.object({
+  status: z.enum(STATUSES),
+  position: z.number().int().min(0),
+});
