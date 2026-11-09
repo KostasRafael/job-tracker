@@ -1,4 +1,9 @@
-import { createApplicationSchema, updateApplicationSchema, moveSchema } from '../validators/application.js';
+import {
+  createApplicationSchema,
+  updateApplicationSchema,
+  moveSchema,
+  listQuerySchema,
+} from '../validators/application.js';
 import * as applicationService from '../services/applicationService.js';
 import parseBody from '../utils/parseBody.js';
 
@@ -9,7 +14,8 @@ export async function createApplication(req, res) {
 }
 
 export async function listApplications(req, res) {
-  const applications = await applicationService.listApplications(req.user._id);
+  const query = parseBody(listQuerySchema, req.query);
+  const applications = await applicationService.listApplications(req.user._id, query);
   res.json(applications);
 }
 

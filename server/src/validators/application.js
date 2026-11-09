@@ -18,3 +18,9 @@ export const moveSchema = z.object({
   status: z.enum(STATUSES),
   position: z.number().int().min(0),
 });
+
+export const listQuerySchema = z.object({
+  status: z.enum(STATUSES).optional(),
+  q: z.string().trim().max(100).optional(),
+  sort: z.enum(['board', 'newest', 'oldest', 'company']).default('board'),
+});

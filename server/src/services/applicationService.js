@@ -7,8 +7,26 @@ export async function createApplication(userId, data) {
   return Application.create({ ...data, user: userId, position });
 }
 
-export async function listApplications(userId) {
-  return Application.find({ user: userId }).sort({ status: 1, position: 1 }).lean();
+const SORTS = {
+  board: { status: 1, position: 1 },
+  newest: { createdAt: -1 },
+  oldest: { createdAt: 1 },
+  company: { company: 1 },
+};
+
+export async function listApplications(userId, { status, q, sort } = {}) {
+  const filter = { user: userId };
+  if (status) {
+    filter.status = status;
+  }
+  if (q) {
+    // Escape regex special characters so the search text is matched literally
+    const escapedQ = q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(escapedQ, 'i');
+    filter.$or = [{ company: regex }, { role: regex }];
+  }
+
+  return Application.find(filter).sort(SORTS[sort] ?? SORTS.board).lean();
 }
 
 async function findOwned(userId, id) {
