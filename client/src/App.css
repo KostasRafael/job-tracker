@@ -29,8 +29,114 @@
 /* Pushed to the far right; holds the user's name and logout button later */
 .navbar-user {
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.navbar-user-name {
+  color: var(--text-h);
+}
+
+.logout-button {
+  font: inherit;
+  font-size: 15px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.logout-button:hover {
+  border-color: var(--accent-border);
+  color: var(--accent);
 }
 
 .page {
   padding: 24px;
+}
+
+/* Login and register forms */
+.auth-page {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  box-sizing: border-box;
+  text-align: left;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-field label {
+  color: var(--text-h);
+  font-weight: 500;
+}
+
+.form-field input {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.form-field input:focus {
+  outline: 2px solid var(--accent-border);
+  outline-offset: 1px;
+}
+
+.field-error {
+  color: #d92d20;
+  font-size: 14px;
+}
+
+.form-alert {
+  margin-bottom: 16px;
+  padding: 10px 12px;
+  border: 1px solid #d92d20;
+  border-radius: 6px;
+  background: rgba(217, 45, 32, 0.08);
+  color: #d92d20;
+}
+
+.auth-form button {
+  font: inherit;
+  font-weight: 600;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+.auth-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-switch {
+  margin-top: 20px;
+}
+
+.auth-switch a {
+  color: var(--accent);
+}
+
+.loading {
+  padding: 48px 16px;
 }
