@@ -140,3 +140,103 @@
 .loading {
   padding: 48px 16px;
 }
+
+/* Applications table */
+.app-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.app-table th,
+.app-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.app-table th {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+/* Loading placeholders */
+.skeleton {
+  display: block;
+  height: 14px;
+  width: 70%;
+  border-radius: 4px;
+  background: var(--border);
+  animation: skeleton-pulse 1.2s ease-in-out infinite;
+}
+
+.skeleton-row td:nth-child(2n) .skeleton {
+  width: 50%;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+  }
+}
+
+/* Empty and error states */
+.state-box {
+  padding: 32px 16px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  text-align: center;
+}
+
+.state-error {
+  border: 1px solid #d92d20;
+  background: rgba(217, 45, 32, 0.08);
+  color: #d92d20;
+}
+
+.state-button {
+  font: inherit;
+  font-weight: 600;
+  margin-top: 8px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  cursor: pointer;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 10px;
+  border: 1px solid var(--badge-color);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--badge-color) 12%, transparent);
+  color: var(--text-h);
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.status-badge-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--badge-color);
+}
