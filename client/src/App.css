@@ -85,7 +85,9 @@
   font-weight: 500;
 }
 
-.form-field input {
+.form-field input,
+.form-field select,
+.form-field textarea {
   font: inherit;
   padding: 8px 10px;
   border: 1px solid var(--border);
@@ -94,7 +96,13 @@
   color: var(--text-h);
 }
 
-.form-field input:focus {
+.form-field textarea {
+  resize: vertical;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
   outline: 2px solid var(--accent-border);
   outline-offset: 1px;
 }
@@ -239,4 +247,184 @@
   height: 8px;
   border-radius: 50%;
   background: var(--badge-color);
+}
+
+/* Application form (used inside the modal) */
+.application-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  text-align: left;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 480px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.button-primary,
+.button-secondary {
+  font: inherit;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.button-primary {
+  border: none;
+  background: var(--accent);
+  color: #fff;
+}
+
+.button-secondary {
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-h);
+}
+
+.button-primary:disabled,
+.button-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Modal */
+.modal {
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg);
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+.modal::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.modal-title {
+  margin: 0 0 16px;
+  font-size: 20px;
+  text-align: left;
+}
+
+/* Page heading with an action button beside it */
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Row actions and delete buttons */
+.row-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.button-small {
+  padding: 4px 10px;
+  font-size: 14px;
+}
+
+.button-danger,
+.button-danger-outline {
+  font: inherit;
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.button-danger {
+  border: none;
+  background: #d92d20;
+  color: #fff;
+}
+
+.button-danger-outline {
+  border: 1px solid #d92d20;
+  background: transparent;
+  color: #d92d20;
+}
+
+.button-danger-outline.button-small {
+  padding: 4px 10px;
+  font-size: 14px;
+}
+
+.button-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.confirm-body {
+  text-align: left;
+}
+
+.confirm-body p {
+  margin: 0 0 20px;
+}
+
+/* Toasts */
+.toasts {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  margin: 0;
+  max-width: 360px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border-left: 4px solid;
+  background: var(--bg);
+  color: var(--text-h);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  text-align: left;
+  animation: toast-in 0.2s ease-out;
+}
+
+.toast-success {
+  border-left-color: #16a34a;
+}
+
+.toast-error {
+  border-left-color: #d92d20;
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
 }
