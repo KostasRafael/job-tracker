@@ -56,6 +56,21 @@
 
 .page {
   padding: 24px;
+  /* lets the board's own scrollbar work instead of widening the page */
+  min-width: 0;
+}
+
+/* Phones: let the navbar wrap onto two rows instead of overflowing */
+@media (max-width: 600px) {
+  .navbar {
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    padding: 12px 16px;
+  }
+
+  .page {
+    padding: 16px;
+  }
 }
 
 /* Login and register forms */
@@ -150,6 +165,12 @@
 }
 
 /* Applications table */
+/* on narrow screens the table scrolls sideways inside this box, not the page */
+.table-scroll {
+  position: relative;
+  overflow-x: auto;
+}
+
 .app-table {
   width: 100%;
   border-collapse: collapse;
@@ -426,5 +447,153 @@
 @media (prefers-reduced-motion: reduce) {
   .toast {
     animation: none;
+  }
+}
+
+/* Board */
+.board {
+  display: grid;
+  grid-auto-flow: column;
+  /* wide screen: the five columns share the width;
+     phone: each stays 260px and the board scrolls sideways */
+  grid-auto-columns: minmax(260px, 1fr);
+  gap: 1rem;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  text-align: left;
+  /* contains absolutely positioned children (the hidden " applications" text),
+     otherwise they escape the scroll area and widen the whole page */
+  position: relative;
+}
+
+.board-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--column-color);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--column-color) 5%, transparent);
+  /* big enough to drop a card onto, even when empty */
+  min-height: 200px;
+  box-sizing: border-box;
+}
+
+.board-column-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.board-column-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--column-color);
+}
+
+.board-column-empty {
+  /* stretch to fill the column, so the whole empty area reads as the drop zone */
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 12px;
+  border: 1px dashed var(--border);
+  border-radius: 6px;
+  font-size: 14px;
+  text-align: center;
+}
+
+.board-column-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+  font-size: 16px;
+}
+
+.board-column-count {
+  min-width: 24px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--column-color) 15%, transparent);
+  color: var(--text-h);
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.board-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.app-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  text-align: left;
+}
+
+.app-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.app-card-company {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-h);
+  overflow-wrap: anywhere;
+}
+
+.app-card-role {
+  margin: 0;
+  color: var(--text-h);
+}
+
+.app-card-details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 0;
+  font-size: 13px;
+}
+
+.app-card-details div {
+  display: flex;
+  gap: 4px;
+}
+
+.app-card-details dd {
+  margin: 0;
+  color: var(--text-h);
+}
+
+.app-card .skeleton-short {
+  width: 50%;
+}
+
+/* The card stays a light box in dark mode too, but a slightly lifted dark one */
+@media (prefers-color-scheme: dark) {
+  .app-card {
+    background: color-mix(in srgb, var(--bg) 88%, #fff);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   }
 }

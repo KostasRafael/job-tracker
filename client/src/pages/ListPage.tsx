@@ -1,29 +1,31 @@
 import { useState, type ReactNode } from 'react';
-import { createApplication, deleteApplication, updateApplication } from '../api/applications';
-import ApplicationForm from '../components/ApplicationForm';
+import { deleteApplication } from '../api/applications';
+import ApplicationFormModal from '../components/ApplicationFormModal';
 import Modal from '../components/Modal';
 import StatusBadge from '../components/StatusBadge';
 import { useToast } from '../context/ToastContext';
 import { useApplications } from '../hooks/useApplications';
-import type { Application, ApplicationInput } from '../types';
+import type { Application } from '../types';
 
 const SKELETON_ROWS = 5;
 const COLUMN_COUNT = 5;
 
 function TableShell({ children, busy = false }: { children: ReactNode; busy?: boolean }) {
   return (
-    <table className="app-table" aria-busy={busy}>
-      <thead>
-        <tr>
-          <th scope="col">Company</th>
-          <th scope="col">Role</th>
-          <th scope="col">Status</th>
-          <th scope="col">Applied</th>
-          <th scope="col">Actions</th>
-        </tr>
-      </thead>
-      <tbody>{children}</tbody>
-    </table>
+    <div className="table-scroll">
+      <table className="app-table" aria-busy={busy}>
+        <thead>
+          <tr>
+            <th scope="col">Company</th>
+            <th scope="col">Role</th>
+            <th scope="col">Status</th>
+            <th scope="col">Applied</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>{children}</tbody>
+      </table>
+    </div>
   );
 }
 
@@ -48,24 +50,6 @@ export default function ListPage() {
   function closeForm() {
     setCreating(false);
     setEditing(null);
-  }
-
-  // On failure: show a toast, then rethrow so the modal stays open and
-  // ApplicationForm shows the message under its submit state too.
-  async function handleSave(data: ApplicationInput) {
-    try {
-      if (editing) {
-        await updateApplication(editing._id, data);
-      } else {
-        await createApplication(data);
-      }
-    } catch (err) {
-      showToast(errorMessage(err), 'error');
-      throw err;
-    }
-    showToast(editing ? 'Changes saved' : 'Application added');
-    closeForm();
-    await refetch();
   }
 
   function openDelete(app: Application) {
@@ -186,23 +170,12 @@ export default function ListPage() {
       </div>
       {content}
 
-      <Modal
+      <ApplicationFormModal
         open={formOpen}
-        title={editing ? 'Edit application' : 'Add application'}
+        application={editing}
         onClose={closeForm}
-      >
-        {/* render the form only while open, and key it by the application,
-            so it always starts from the right values */}
-        {formOpen && (
-          <ApplicationForm
-            key={editing?._id ?? 'new'}
-            initialValues={editing ?? undefined}
-            submitLabel={editing ? 'Save changes' : 'Add application'}
-            onSubmit={handleSave}
-            onCancel={closeForm}
-          />
-        )}
-      </Modal>
+        onSaved={refetch}
+      />
 
       <Modal open={deleting !== null} title="Delete application" onClose={closeDelete}>
         {deleting && (
