@@ -2,7 +2,8 @@ import { useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import {
   DndContext,
   DragOverlay,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   closestCorners,
   useDroppable,
   useSensor,
@@ -12,9 +13,13 @@ import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { moveApplication } from '../api/applications';
 import ApplicationCard, { ApplicationCardView } from '../components/ApplicationCard';
+import ApplicationDetailModal from '../components/ApplicationDetailModal';
 import ApplicationFormModal from '../components/ApplicationFormModal';
+import DeleteApplicationModal from '../components/DeleteApplicationModal';
+import SearchBox from '../components/SearchBox';
 import { useToast } from '../context/ToastContext';
 import { useApplications } from '../hooks/useApplications';
+import { useDebounce } from '../hooks/useDebounce';
 import { STATUSES, type Application, type ApplicationStatus } from '../types';
 import { STATUS_META } from '../utils/statuses';
 
@@ -53,7 +58,11 @@ function moveLocally(
 
 // The area under a column's title that accepts dropped cards. Its id is the
 // status, so dropping on an empty part of a column gives over.id === status.
-function ColumnDropZone({ status, cards, children }: {
+function ColumnDropZone({
+  status,
+  cards,
+  children,
+}: {
   status: ApplicationStatus;
   cards: Application[];
   children: ReactNode;
@@ -104,16 +113,53 @@ function BoardColumn({
 }
 
 export default function BoardPage() {
-  const { applications, setApplications, loading, error, refetch } = useApplications();
+  // `search` updates on every keystroke and drives the input; `debouncedSearch`
+  // only catches up 300ms after typing stops, and is what goes to the server.
+  const [search, setSearch] = useState('');
+  const debouncedSearch = useDebounce(search, 300).trim();
+  const { applications, setApplications, loading, error, refetch } = useApplications({
+    q: debouncedSearch || undefined,
+  });
+  // the skeleton is only for the very first load; later reloads (a new search)
+  // keep the current cards on screen until the new ones arrive
+  const initialLoading = loading && applications.length === 0;
+
+  // A filtered board only shows some cards, so positions worked out from it
+  // would be wrong. Drag stays off while anything is typed, until the debounced
+  // value has caught up, and while the full list is still loading back in.
+  const dragDisabled = search.trim() !== '' || debouncedSearch !== '' || loading;
   const { showToast } = useToast();
   // Which modal is open: adding a new one, or editing one (null means none).
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState<Application | null>(null);
+  const [deleting, setDeleting] = useState<Application | null>(null);
+  // The card whose details are open. Stored as an id and looked up in
+  // `applications`, so the panel always shows the latest data.
+  const [viewingId, setViewingId] = useState<string | null>(null);
+  const viewing = applications.find((a) => a._id === viewingId) ?? null;
+
+  // The panel's Edit and Delete close it first and then open the shared
+  // modal, so only one dialog is on screen at a time.
+  function editFromDetails(app: Application) {
+    setViewingId(null);
+    setEditing(app);
+  }
+
+  function deleteFromDetails(app: Application) {
+    setViewingId(null);
+    setDeleting(app);
+  }
   // the id of the card being dragged, shown in the DragOverlay
   const [activeId, setActiveId] = useState<string | null>(null);
 
   // a drag only starts after the pointer moves 5px, so clicks (and Edit) still work
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  // Mouse: a drag starts after moving 5px, so clicks (and Edit) still work.
+  // Touch: press and hold 250ms first (moving more than 5px before that cancels),
+  // so a normal swipe on a card scrolls the page and the board instead of dragging.
+  const sensors = useSensors(
+    useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } })
+  );
 
   function handleDragStart(event: DragStartEvent) {
     setActiveId(String(event.active.id));
@@ -121,7 +167,7 @@ export default function BoardPage() {
 
   async function handleDragEnd({ active, over }: DragEndEvent) {
     setActiveId(null);
-    if (!over) return; // dropped outside the board
+    if (!over || dragDisabled) return; // dropped outside the board, or drag is off
 
     const card = applications.find((a) => a._id === active.id);
     if (!card) return;
@@ -181,7 +227,7 @@ export default function BoardPage() {
 
   let content: ReactNode;
 
-  if (loading) {
+  if (initialLoading) {
     content = (
       <>
         <p className="visually-hidden" role="status">
@@ -212,6 +258,15 @@ export default function BoardPage() {
         </button>
       </div>
     );
+  } else if (applications.length === 0 && debouncedSearch) {
+    content = (
+      <div className="state-box">
+        <p>No applications match “{debouncedSearch}”.</p>
+        <button type="button" className="state-button" onClick={() => setSearch('')}>
+          Clear search
+        </button>
+      </div>
+    );
   } else if (applications.length === 0) {
     content = (
       <div className="state-box">
@@ -221,52 +276,70 @@ export default function BoardPage() {
     );
   } else {
     content = (
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCorners}
-        onDragStart={handleDragStart}
-        onDragEnd={handleDragEnd}
-        onDragCancel={() => setActiveId(null)}
-      >
-        <div className="board">
-          {STATUSES.map((status) => (
-            <BoardColumn key={status} status={status} count={columns[status].length}>
-              <ColumnDropZone status={status} cards={columns[status]}>
-                {columns[status].length === 0 ? (
-                  <p className="board-column-empty">No applications</p>
-                ) : (
-                  <ul className="board-cards">
-                    {columns[status].map((app) => (
-                      <li key={app._id}>
-                        <ApplicationCard application={app} onEdit={setEditing} />
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </ColumnDropZone>
-            </BoardColumn>
-          ))}
-        </div>
+      <>
+        {search.trim() !== '' && (
+          <p className="board-hint" role="status">
+            Clear the search to move cards.
+          </p>
+        )}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onDragCancel={() => setActiveId(null)}
+        >
+          <div className="board">
+            {STATUSES.map((status) => (
+              <BoardColumn key={status} status={status} count={columns[status].length}>
+                <ColumnDropZone status={status} cards={columns[status]}>
+                  {columns[status].length === 0 ? (
+                    <p className="board-column-empty">No applications</p>
+                  ) : (
+                    <ul className="board-cards">
+                      {columns[status].map((app) => (
+                        <li key={app._id}>
+                          <ApplicationCard
+                            application={app}
+                            onEdit={setEditing}
+                            onOpen={(a) => setViewingId(a._id)}
+                            dragDisabled={dragDisabled}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </ColumnDropZone>
+              </BoardColumn>
+            ))}
+          </div>
 
-        <DragOverlay>
-          {activeCard ? (
-            <ApplicationCardView
-              application={activeCard}
-              onEdit={setEditing}
-              className="app-card-overlay"
-            />
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+          <DragOverlay>
+            {activeCard ? (
+              <ApplicationCardView
+                application={activeCard}
+                onEdit={setEditing}
+                className="app-card-overlay"
+              />
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      </>
     );
   }
+
+  // the "no applications yet" state has its own button, so don't show two
+  const showHeaderAdd =
+    !initialLoading && !error && (applications.length > 0 || debouncedSearch !== '');
 
   return (
     <>
       <div className="page-header">
         <h1>Board</h1>
-        {/* the empty state has its own button, so don't show two */}
-        {!loading && !error && applications.length > 0 && addButton}
+        <div className="page-header-actions">
+          <SearchBox value={search} onChange={setSearch} />
+          {showHeaderAdd && addButton}
+        </div>
       </div>
       {content}
 
@@ -275,6 +348,19 @@ export default function BoardPage() {
         application={editing}
         onClose={closeForm}
         onSaved={refetch}
+      />
+
+      <ApplicationDetailModal
+        application={viewing}
+        onClose={() => setViewingId(null)}
+        onEdit={editFromDetails}
+        onDelete={deleteFromDetails}
+      />
+
+      <DeleteApplicationModal
+        application={deleting}
+        onClose={() => setDeleting(null)}
+        onDeleted={refetch}
       />
     </>
   );

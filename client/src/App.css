@@ -354,6 +354,55 @@
   flex-wrap: wrap;
 }
 
+/* Search box and add button share the right side of the page header */
+.page-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.search-box input {
+  font: inherit;
+  width: 240px;
+  max-width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+  box-sizing: border-box;
+}
+
+.filter-select select {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.filter-select select:focus,
+.search-box input:focus {
+  outline: 2px solid var(--accent-border);
+  outline-offset: 1px;
+}
+
+@media (max-width: 600px) {
+  .page-header-actions,
+  .search-box,
+  .search-box input {
+    width: 100%;
+  }
+}
+
+.board-hint {
+  margin: 0 0 12px;
+  font-size: 14px;
+  text-align: left;
+}
+
 /* Row actions and delete buttons */
 .row-actions {
   display: flex;
@@ -541,9 +590,96 @@
   background: color-mix(in srgb, var(--column-color) 10%, transparent);
 }
 
+/* only cards that can be dragged get the grab cursor (they lose these
+   attributes while a search is active) */
 .app-card[aria-roledescription='sortable'] {
   cursor: grab;
-  touch-action: none;
+  /* lets a swipe scroll; the TouchSensor's press-and-hold starts a drag */
+  touch-action: manipulation;
+  /* no text selection or iOS callout menu during the press-and-hold */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.app-card-clickable {
+  cursor: pointer;
+}
+
+.app-card-clickable:hover {
+  border-color: var(--accent-border);
+}
+
+/* the company name as a button: looks like the plain heading it replaces */
+.app-card-open {
+  all: unset;
+  cursor: pointer;
+  overflow-wrap: anywhere;
+}
+
+.app-card-open:focus-visible {
+  outline: 2px solid var(--accent-border);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* Detail panel (the modal opened by clicking a card) */
+.detail-body {
+  text-align: left;
+}
+
+.detail-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.detail-role {
+  margin: 0;
+  font-size: 17px;
+  color: var(--text-h);
+}
+
+.detail-list {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 20px;
+}
+
+.detail-list div {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  gap: 12px;
+}
+
+.detail-list dt {
+  font-weight: 500;
+}
+
+.detail-list dd {
+  margin: 0;
+  color: var(--text-h);
+  overflow-wrap: anywhere;
+}
+
+/* keeps the line breaks the user typed into the notes */
+.detail-notes {
+  white-space: pre-wrap;
+}
+
+.detail-empty {
+  color: var(--text);
+  font-style: italic;
+}
+
+@media (max-width: 480px) {
+  .detail-list div {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
 }
 
 .app-card-overlay {
@@ -619,5 +755,110 @@
   .app-card {
     background: color-mix(in srgb, var(--bg) 88%, #fff);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+}
+
+/* ---------------------------------------------------------------------------
+   Phones and touch screens
+   --------------------------------------------------------------------------- */
+
+/* Modals never grow past the screen; long forms scroll inside the modal.
+   dvh follows the visible height on phones (minus the browser's address bar);
+   the vh line is the fallback for browsers without dvh. */
+.modal {
+  max-height: 90vh;
+  max-height: 90dvh;
+  overflow-y: auto;
+}
+
+/* Fingers need bigger targets than a mouse: at least 44px high */
+@media (max-width: 600px), (pointer: coarse) {
+  .button-primary,
+  .button-secondary,
+  .button-danger,
+  .button-danger-outline,
+  .button-small,
+  .logout-button,
+  .state-button,
+  .search-box input,
+  .filter-select select,
+  .form-field input,
+  .form-field select {
+    min-height: 44px;
+  }
+
+  .navbar-links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+}
+
+/* Phones: each table row becomes a small stacked card, so Edit and Delete are
+   on screen instead of hidden past the right edge of a sideways-scrolling table.
+   Columns: 1 company, 2 role, 3 status, 4 applied, 5 actions. */
+@media (max-width: 600px) {
+  .app-table thead {
+    /* the column names don't fit a stacked layout; hide them visually only */
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  .app-table,
+  .app-table tbody {
+    display: block;
+  }
+
+  .app-table tr {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'company status'
+      'role role'
+      'applied applied'
+      'actions actions';
+    gap: 4px 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .app-table td {
+    display: block;
+    padding: 0;
+    border: none;
+    overflow-wrap: anywhere;
+  }
+
+  .app-table td:nth-child(1) {
+    grid-area: company;
+    color: var(--text-h);
+    font-weight: 600;
+  }
+
+  .app-table td:nth-child(2) {
+    grid-area: role;
+  }
+
+  .app-table td:nth-child(3) {
+    grid-area: status;
+    align-self: start;
+  }
+
+  .app-table td:nth-child(4) {
+    grid-area: applied;
+    font-size: 14px;
+  }
+
+  /* the header row is hidden, so label the date here instead */
+  .app-table tr:not(.skeleton-row) td:nth-child(4)::before {
+    content: 'Applied: ';
+  }
+
+  .app-table td:nth-child(5) {
+    grid-area: actions;
+    padding-top: 4px;
   }
 }

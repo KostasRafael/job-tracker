@@ -6,6 +6,8 @@ import type { Application } from '../types';
 interface ApplicationCardProps {
   application: Application;
   onEdit: (application: Application) => void;
+  // clicking anywhere on the card except Edit; left out on the drag overlay copy
+  onOpen?: (application: Application) => void;
 }
 
 type CardViewProps = ApplicationCardProps & HTMLAttributes<HTMLElement>;
@@ -13,17 +15,41 @@ type CardViewProps = ApplicationCardProps & HTMLAttributes<HTMLElement>;
 // The card's markup only, with no drag logic. The board card below wraps it
 // with useSortable, and the DragOverlay renders it directly as the floating copy.
 export const ApplicationCardView = forwardRef<HTMLElement, CardViewProps>(
-  function ApplicationCardView({ application, onEdit, className, ...rest }, ref) {
+  function ApplicationCardView({ application, onEdit, onOpen, className, ...rest }, ref) {
     const { company, role, appliedAt, salary } = application;
+    const classes = ['app-card', onOpen && 'app-card-clickable', className].filter(Boolean);
 
     return (
-      <article ref={ref} className={`app-card ${className ?? ''}`.trim()} {...rest}>
+      <article
+        ref={ref}
+        className={classes.join(' ')}
+        onClick={onOpen ? () => onOpen(application) : undefined}
+        {...rest}
+      >
         <div className="app-card-header">
-          <h3 className="app-card-company">{company}</h3>
+          <h3 className="app-card-company">
+            {onOpen ? (
+              // Mouse users click anywhere on the card; this button gives keyboard
+              // and screen reader users the same action. It needs no handler of
+              // its own: its click (also fired by Enter/Space) bubbles to the card.
+              <button
+                type="button"
+                className="app-card-open"
+                aria-label={`View details for ${role} at ${company}`}
+              >
+                {company}
+              </button>
+            ) : (
+              company
+            )}
+          </h3>
           <button
             type="button"
             className="button-secondary button-small"
-            onClick={() => onEdit(application)}
+            onClick={(e) => {
+              e.stopPropagation(); // Edit only, don't also open the details
+              onEdit(application);
+            }}
             aria-label={`Edit ${role} at ${company}`}
           >
             Edit
@@ -48,9 +74,15 @@ export const ApplicationCardView = forwardRef<HTMLElement, CardViewProps>(
   }
 );
 
-export default function ApplicationCard({ application, onEdit }: ApplicationCardProps) {
+export default function ApplicationCard({
+  application,
+  onEdit,
+  onOpen,
+  dragDisabled = false,
+}: ApplicationCardProps & { dragDisabled?: boolean }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: application._id,
+    disabled: dragDisabled,
   });
 
   const style: CSSProperties = {
@@ -65,9 +97,11 @@ export default function ApplicationCard({ application, onEdit }: ApplicationCard
       ref={setNodeRef}
       application={application}
       onEdit={onEdit}
+      onOpen={onOpen}
       style={style}
-      {...attributes}
-      {...listeners}
+      // while disabled, leave out the drag handlers (and the role="button"
+      // attributes), so the card is just a plain card
+      {...(dragDisabled ? {} : { ...attributes, ...listeners })}
     />
   );
 }
