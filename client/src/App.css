@@ -862,3 +862,56 @@
     padding-top: 4px;
   }
 }
+
+/* ---------------------------------------------------------------------------
+   Stats page
+   --------------------------------------------------------------------------- */
+
+.stat-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column-reverse; /* number above, label below */
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  text-align: left;
+}
+
+.stat-card-value {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text-h);
+  font-variant-numeric: tabular-nums;
+}
+
+.stat-card-label {
+  font-size: 14px;
+}
+
+.stat-card-skeleton {
+  width: 48px;
+  height: 40px;
+}
+
+.stats-section {
+  margin-top: 32px;
+}
+
+.stats-section h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.chart-summary {
+  margin: 8px 0 0;
+  font-size: 14px;
+}

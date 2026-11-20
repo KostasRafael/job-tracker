@@ -39,3 +39,10 @@ export interface ApplicationInput {
   notes?: string;
   appliedAt?: string;
 }
+
+// what GET /api/stats returns
+export interface Stats {
+  total: number;
+  byStatus: Record<ApplicationStatus, number>;
+  perWeek: { weekStart: string; count: number }[]; // weekStart is a Monday, such as "2026-10-05"
+}

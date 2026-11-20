@@ -7,6 +7,7 @@ import errorHandler from './middleware/errorHandler.js';
 
 import authRouter from './routes/authRoutes.js';
 import applicationRouter from './routes/applicationRoutes.js';
+import statsRouter from './routes/statsRoutes.js';
 
 const app = express();
 app.use(helmet()); // sets safe HTTP response headers
@@ -15,6 +16,7 @@ app.use(cookieParser()); // fills req.cookies from the Cookie header
 
 app.use('/api/auth', authRouter);
 app.use('/api/applications', applicationRouter);
+app.use('/api/stats', statsRouter);
 
 app.get('/api/health', (req, res) => {
   res.json({ ok: true });
