@@ -136,7 +136,7 @@
   border: none;
   border-radius: 6px;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   cursor: pointer;
 }
 
@@ -228,7 +228,7 @@
   border: none;
   border-radius: 6px;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
   cursor: pointer;
 }
 
@@ -301,7 +301,7 @@
 .button-primary {
   border: none;
   background: var(--accent);
-  color: #fff;
+  color: var(--on-accent);
 }
 
 .button-secondary {

@@ -4,9 +4,11 @@
   --bg: #fff;
   --border: #e5e4e7;
   --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
+  /* #9333ea is 5.4:1 on white (WCAG AA needs 4.5:1); the old #aa3bff was 4.4:1 */
+  --accent: #9333ea;
+  --accent-bg: rgba(147, 51, 234, 0.1);
+  --accent-border: rgba(147, 51, 234, 0.5);
+  --on-accent: #fff; /* text on an accent background */
   --social-bg: rgba(244, 243, 236, 0.5);
   --shadow:
     rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
@@ -40,6 +42,8 @@
     --accent: #c084fc;
     --accent-bg: rgba(192, 132, 252, 0.15);
     --accent-border: rgba(192, 132, 252, 0.5);
+    /* white on the light dark-mode purple is only 2.6:1, dark text is 6.8:1 */
+    --on-accent: #16171d;
     --social-bg: rgba(47, 48, 58, 0.5);
     --shadow:
       rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
