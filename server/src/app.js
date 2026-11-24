@@ -10,8 +10,12 @@ import applicationRouter from './routes/applicationRoutes.js';
 import statsRouter from './routes/statsRoutes.js';
 
 const app = express();
+// On Render the app sits behind one proxy. This makes req.ip the real visitor
+// address (from X-Forwarded-For) instead of the proxy's, so the rate limiter
+// counts each visitor separately.
+app.set('trust proxy', 1);
 app.use(helmet()); // sets safe HTTP response headers
-app.use(express.json()); // lets the server read JSON request bodies
+app.use(express.json({ limit: '10kb' })); // reads JSON bodies; larger ones get 413
 app.use(cookieParser()); // fills req.cookies from the Cookie header
 
 app.use('/api/auth', authRouter);
