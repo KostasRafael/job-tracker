@@ -109,3 +109,11 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+/* One focus style for the whole app. :focus-visible shows it for keyboard
+   users and hides it after a mouse click. Never remove an outline without
+   replacing it with something just as visible. */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}

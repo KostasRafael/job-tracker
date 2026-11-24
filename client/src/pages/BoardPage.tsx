@@ -27,6 +27,7 @@ import { useApplications } from '../hooks/useApplications';
 import { useDebounce } from '../hooks/useDebounce';
 import { STATUSES, type Application, type ApplicationStatus } from '../types';
 import { STATUS_META } from '../utils/statuses';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const SKELETON_CARDS = 2;
 
@@ -118,6 +119,7 @@ function BoardColumn({
 }
 
 export default function BoardPage() {
+  usePageTitle('Board');
   // `search` updates on every keystroke and drives the input; `debouncedSearch`
   // only catches up 300ms after typing stops, and is what goes to the server.
   const [search, setSearch] = useState('');

@@ -115,13 +115,6 @@
   resize: vertical;
 }
 
-.form-field input:focus,
-.form-field select:focus,
-.form-field textarea:focus {
-  outline: 2px solid var(--accent-border);
-  outline-offset: 1px;
-}
-
 .field-error {
   color: #d92d20;
   font-size: 14px;
@@ -383,12 +376,6 @@
   color: var(--text-h);
 }
 
-.filter-select select:focus,
-.search-box input:focus {
-  outline: 2px solid var(--accent-border);
-  outline-offset: 1px;
-}
-
 @media (max-width: 600px) {
   .page-header-actions,
   .search-box,
@@ -617,8 +604,9 @@
   overflow-wrap: anywhere;
 }
 
+/* `all: unset` above also wipes the global :focus-visible outline, so put it back */
 .app-card-open:focus-visible {
-  outline: 2px solid var(--accent-border);
+  outline: 3px solid var(--accent);
   outline-offset: 2px;
   border-radius: 2px;
 }

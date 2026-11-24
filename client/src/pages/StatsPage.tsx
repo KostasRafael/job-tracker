@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import WeeklyChart from '../components/WeeklyChart';
 import { useStats } from '../hooks/useStats';
 import type { Stats } from '../types';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const SUMMARY_CARDS: { label: string; value: (stats: Stats) => number }[] = [
   { label: 'Total', value: (s) => s.total },
@@ -11,6 +12,7 @@ const SUMMARY_CARDS: { label: string; value: (stats: Stats) => number }[] = [
 ];
 
 export default function StatsPage() {
+  usePageTitle('Stats');
   const { data, loading, error, refetch } = useStats();
 
   let content: ReactNode;

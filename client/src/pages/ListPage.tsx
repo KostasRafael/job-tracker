@@ -8,6 +8,7 @@ import { useApplications } from '../hooks/useApplications';
 import { useDebounce } from '../hooks/useDebounce';
 import { STATUSES, type Application, type ApplicationStatus } from '../types';
 import { STATUS_META } from '../utils/statuses';
+import { usePageTitle } from '../hooks/usePageTitle';
 
 const SKELETON_ROWS = 5;
 const COLUMN_COUNT = 5;
@@ -50,6 +51,7 @@ function TableShell({ children, busy = false }: { children: ReactNode; busy?: bo
 }
 
 export default function ListPage() {
+  usePageTitle('List');
   // Search, status and sort live in the URL (/list?q=acme&status=applied&sort=oldest),
   // so a refresh keeps them and the link can be shared.
   const [searchParams, setSearchParams] = useSearchParams();
