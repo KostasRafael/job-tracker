@@ -2,6 +2,7 @@ import { useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import {
   DndContext,
   DragOverlay,
+  KeyboardSensor,
   MouseSensor,
   TouchSensor,
   closestCorners,
@@ -10,7 +11,11 @@ import {
   useSensors,
 } from '@dnd-kit/core';
 import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import {
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
 import { moveApplication } from '../api/applications';
 import ApplicationCard, { ApplicationCardView } from '../components/ApplicationCard';
 import ApplicationDetailModal from '../components/ApplicationDetailModal';
@@ -152,13 +157,15 @@ export default function BoardPage() {
   // the id of the card being dragged, shown in the DragOverlay
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  // a drag only starts after the pointer moves 5px, so clicks (and Edit) still work
   // Mouse: a drag starts after moving 5px, so clicks (and Edit) still work.
   // Touch: press and hold 250ms first (moving more than 5px before that cancels),
   // so a normal swipe on a card scrolls the page and the board instead of dragging.
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } })
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } }),
+    // Keyboard: Tab to a card, Space/Enter picks it up, arrow keys move it,
+    // Space/Enter drops it, Escape cancels.
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
   function handleDragStart(event: DragStartEvent) {

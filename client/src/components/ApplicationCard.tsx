@@ -80,10 +80,26 @@ export default function ApplicationCard({
   onOpen,
   dragDisabled = false,
 }: ApplicationCardProps & { dragDisabled?: boolean }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    setActivatorNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({
     id: application._id,
     disabled: dragDisabled,
   });
+
+  // The card itself is also the drag activator. Then the keyboard sensor only
+  // starts a drag when Space/Enter is pressed on the card, not when it bubbles
+  // up from the Edit or company buttons inside it (those keep working normally).
+  function setRefs(node: HTMLElement | null) {
+    setNodeRef(node);
+    setActivatorNodeRef(node);
+  }
 
   const style: CSSProperties = {
     transform: CSS.Transform.toString(transform),
@@ -94,7 +110,7 @@ export default function ApplicationCard({
 
   return (
     <ApplicationCardView
-      ref={setNodeRef}
+      ref={setRefs}
       application={application}
       onEdit={onEdit}
       onOpen={onOpen}
