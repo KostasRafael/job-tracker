@@ -31,7 +31,7 @@ export async function listApplications(userId, { status, q, sort } = {}) {
 
 async function findOwned(userId, id) {
   const card = await Application.findOne({ _id: id, user: userId });
-  if (!card) throw new HttpError(404, 'Application not found');
+  if (!card) {throw new HttpError(404, 'Application not found');}
   return card;
 }
 

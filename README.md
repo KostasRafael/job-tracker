@@ -1,3 +1,5 @@
+![CI](https://github.com/KostasRafael/job-tracker/actions/workflows/ci.yml/badge.svg)
+
 # job-tracker
 
 ## API
