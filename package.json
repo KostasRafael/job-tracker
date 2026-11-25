@@ -3,5 +3,25 @@
     "bcrypt": "^6.0.0",
     "react-router-dom": "^7.18.5",
     "zod": "^4.6.7"
-  }
+  },
+  "name": "job-tracker",
+  "version": "1.0.0",
+  "description": "All endpoints are under `/api`, and request and response bodies are JSON. Logging in or registering sets an httpOnly cookie named `token`. Endpoints that require login read that cookie and reply `401` without it.",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm --prefix client install --include=dev && npm --prefix client run build && npm --prefix server install",
+    "start": "npm --prefix server start"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KostasRafael/job-tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/KostasRafael/job-tracker/issues"
+  },
+  "homepage": "https://github.com/KostasRafael/job-tracker#readme"
 }
