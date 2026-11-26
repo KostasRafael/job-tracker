@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router-dom';
 import LoginPage from './LoginPage';
+import { DEMO_CREDENTIALS } from '../utils/demo';
 
 const login = vi.fn();
 
@@ -41,6 +42,15 @@ it('calls login with the typed email and password', async () => {
 
   expect(login).toHaveBeenCalledTimes(1);
   expect(login).toHaveBeenCalledWith({ email: 'jane@example.com', password: 'secret123' });
+});
+
+it('logs in with the demo account when "Try demo" is clicked', async () => {
+  login.mockResolvedValue(undefined);
+  renderPage();
+
+  await userEvent.click(screen.getByRole('button', { name: /try demo/i }));
+
+  expect(login).toHaveBeenCalledWith(DEMO_CREDENTIALS);
 });
 
 it('shows the server error when login fails', async () => {

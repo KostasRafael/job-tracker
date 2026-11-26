@@ -2,6 +2,7 @@ import { useState, type ChangeEvent, type FormEvent } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { usePageTitle } from '../hooks/usePageTitle';
+import { DEMO_CREDENTIALS } from '../utils/demo';
 
 export default function LoginPage() {
   usePageTitle('Log in');
@@ -36,6 +37,20 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       await login({ email: values.email.trim(), password: values.password });
+      navigate('/');
+    } catch (error) {
+      setServerError(error instanceof Error ? error.message : 'Something went wrong');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function handleDemo() {
+    setServerError(null);
+    setFieldErrors({});
+    setSubmitting(true);
+    try {
+      await login(DEMO_CREDENTIALS);
       navigate('/');
     } catch (error) {
       setServerError(error instanceof Error ? error.message : 'Something went wrong');
@@ -87,6 +102,21 @@ export default function LoginPage() {
           {submitting ? 'Logging in...' : 'Log in'}
         </button>
       </form>
+
+      <div className="auth-demo">
+        <button
+          type="button"
+          className="button-secondary"
+          onClick={handleDemo}
+          disabled={submitting}
+          aria-describedby="demo-hint"
+        >
+          Try demo
+        </button>
+        <p id="demo-hint" className="auth-demo-hint">
+          Explore with sample data. No sign-up needed.
+        </p>
+      </div>
 
       <p className="auth-switch">
         Don't have an account? <Link to="/register">Create one</Link>

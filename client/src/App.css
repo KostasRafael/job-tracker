@@ -145,6 +145,23 @@
   cursor: not-allowed;
 }
 
+.auth-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 16px;
+}
+
+.auth-demo .button-secondary {
+  padding: 10px;
+}
+
+.auth-demo-hint {
+  margin: 0;
+  font-size: 15px;
+  text-align: center;
+}
+
 .auth-switch {
   margin-top: 20px;
 }
